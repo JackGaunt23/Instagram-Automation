@@ -1,16 +1,29 @@
 require("dotenv").config();
-
+const express = require('express');
+const multer = require('multer');
 const { IgApiClient } = require('instagram-private-api');
-const { get } = require('request-promise');
 const fs = require('fs');
 
-const postToInsta = async () => {
-    const ig = new IgApiClient();
-    ig.state.generateDevice(process.env.IG_USERNAME);
-    await ig.account.login(process.env.IG_USERNAME, process.env.IG_PASSWORD);
+const app = express();
+const upload = multer({dest: "uploads/"});
+app.use(express.static('public'));
 
-    const videoBuffer = fs.readFileSync("C:/Users/jackg/Videos/letthingsbe_testvid.mp4");
-    const coverImage = fs.readFileSync("C:/Users/jackg/Downloads/Screenshot 2024-08-11 123506.jpg");
+app.post("/post", upload.fields([{name: "video"}, {name:"cover"}]), async (req, res) => {
+    const username = req.body.username;
+    const password = req.body.password;
+    const videoPath = req.files.video[0].path;
+    const coverPath = req.files.cover[0].path;
+    postToInsta(username, password, videoPath, coverPath);
+})
+
+
+const postToInsta = async (username, password, videoPath, coverPath) => {
+    const ig = new IgApiClient();
+    ig.state.generateDevice(username);
+    await ig.account.login(username, password);
+
+    const videoBuffer = fs.readFileSync(videoPath); //"C:/Users/jackg/Videos/letthingsbe_testvid.mp4"
+    const coverImage = fs.readFileSync(coverPath); //C:/Users/jackg/Downloads/Screenshot 2024-08-11 123506.jpg
 
     const videoOptions = {
         video: videoBuffer,
@@ -21,4 +34,8 @@ const postToInsta = async () => {
     await ig.publish.video(videoOptions);
 }
 
-postToInsta();
+
+const PORT = process.env.PORT || 5500;
+app.listen(PORT, () => {
+    console.log(`Server is running on http://localhost:${PORT}`);
+})
