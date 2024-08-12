@@ -1,3 +1,5 @@
+const VideoQueue = require('./queue');
+const {logIntoAcc, postVideo} = require('./instagram');
 require("dotenv").config();
 const express = require('express');
 const multer = require('multer');
@@ -7,31 +9,37 @@ const fs = require('fs');
 const app = express();
 const upload = multer({dest: "uploads/"});
 app.use(express.static('public'));
+const videoQueue = new VideoQueue();
 
-app.post("/post", upload.fields([{name: "video"}, {name:"cover"}]), async (req, res) => {
-    const username = req.body.username;
-    const password = req.body.password;
-    const videoPath = req.files.video[0].path;
-    const coverPath = req.files.cover[0].path;
-    postToInsta(username, password, videoPath, coverPath);
-})
+app.post("/add_to_queue", upload.fields([{name: "video"}, {name:"cover"}]), async (req, res) => {
+    try{
+        const username = process.env.IG_USERNAME;
+        const password = process.env.IG_PASSWORD;
 
+        const videoPath = req.files.video[0].path;
+        const coverPath = req.files.cover[0].path;
+        const caption = req.body.caption;
 
-const postToInsta = async (username, password, videoPath, coverPath) => {
-    const ig = new IgApiClient();
-    ig.state.generateDevice(username);
-    await ig.account.login(username, password);
+        const videoDetails = {
+            videoPath: videoPath,
+            coverPath: coverPath,
+            caption: caption
+        }
 
-    const videoBuffer = fs.readFileSync(videoPath); //"C:/Users/jackg/Videos/letthingsbe_testvid.mp4"
-    const coverImage = fs.readFileSync(coverPath); //C:/Users/jackg/Downloads/Screenshot 2024-08-11 123506.jpg
+        addtoQueue(videoDetails);
 
-    const videoOptions = {
-        video: videoBuffer,
-        coverImage: coverImage,
-        caption: 'Let things be',
-    };
+        res.send(`Video, ${videoPath} recevied and processed by server!`);
+    } catch (error) {
+        console.error(error);
+        res.status(500).send("An error occurred while uploading the video");
+    }
 
-    await ig.publish.video(videoOptions);
+});
+
+async function addtoQueue(videoDetails){
+    videoQueue.enqueue(videoDetails);
+    console.log("Video added to the queue!");
+    console.log("queue:" + videoQueue.peek().caption); // quick test
 }
 
 

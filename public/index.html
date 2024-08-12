@@ -6,13 +6,8 @@
 	<title>Instagram Automation</title>
 </head>
 <body>
-	<h1>Post a Video to Instagram</h1>
-    <form action="/post" method="POST" enctype="multipart/form-data">
-        <label for="username">Instagram Username:</label>
-        <input type="text" id="username" name="username" required><br><br>
-
-        <label for="password">Instagram Password:</label>
-        <input type="password" id="password" name="password" required><br><br>
+	<h1>Add a Video to your Instagram Posting Queue</h1>
+    <form action="/add_to_queue" method="POST" enctype="multipart/form-data">
 
         <label for="video">Video File:</label>
         <input type="file" id="video" name="video" accept="video/*" required><br><br>
@@ -23,7 +18,7 @@
         <label for="caption">Caption:</label>
         <textarea id="caption" name="caption" rows="4" cols="50" required></textarea><br><br>
 
-        <input type="submit" value="Post to Instagram">
+        <input type="submit" value="Add to Queue">
     </form>
 </body>
 </html>
