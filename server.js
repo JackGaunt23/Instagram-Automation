@@ -44,6 +44,21 @@ app.get('/get-queue-html', (req, res) => {
     res.send(htmlContent);
 });
 
+app.delete('/delete_from_queue/:index', (req, res) => {
+    try{
+        const index = parseInt(req.params.index, 10);
+        videoQueue.dequeue(index);
+        htmlContent = '';
+        videoQueue.queue.forEach((videoDetails, i) => {
+            htmlContent += addHtml(videoDetails, i);
+        });
+        res.send("Item deleted successfully");
+    } catch (error) {
+        console.error('Error deleting item:', error);
+        res.status(500).send("An error occurred while deleting the item");
+    }
+});
+
 // Function to add video to queue and update HTML content
 function addToQueue(videoDetails) {
     videoQueue.enqueue(videoDetails);

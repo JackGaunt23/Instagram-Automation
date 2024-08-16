@@ -1,4 +1,4 @@
-function addHtml(videoDetails) {
+function addHtml(videoDetails, index) {
     return `
         <div class="video-container">
             <div class="video-item">
@@ -10,6 +10,7 @@ function addHtml(videoDetails) {
             <div class="video-item caption">
                 <p>${videoDetails.caption}</p>
             </div>
+            <button class="delete-button" data-index="${index}">Delete</button>
         </div>
     `;
 }

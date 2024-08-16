@@ -7,9 +7,13 @@ class VideoQueue{
         this.queue.push(videoDetails);
     }
 
+    dequeue(index){
+        this.queue.splice(index, 1);
+    }
+
     dequeue(){
         return this.queue.shift();
-    }
+    } 
 
     peek(){
         return this.queue[0];
