@@ -1,0 +1,22 @@
+.video-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    border: 1px solid #ccc;
+    padding: 10px;
+    margin-bottom: 10px;
+}
+
+.video-item {
+    margin-right: 20px;
+}
+
+.video-item video, .video-item img {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+}
+
+.caption {
+    max-width: 200px;
+}

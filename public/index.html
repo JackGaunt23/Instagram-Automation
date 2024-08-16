@@ -4,11 +4,11 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>Instagram Automation</title>
+    <link rel="stylesheet" href="./styles/style.css">
 </head>
 <body>
 	<h1>Add a Video to your Instagram Posting Queue</h1>
-    <form action="/add_to_queue" method="POST" enctype="multipart/form-data">
-
+    <form id="videoForm" enctype="multipart/form-data">
         <label for="video">Video File:</label>
         <input type="file" id="video" name="video" accept="video/*" required><br><br>
 
@@ -20,5 +20,8 @@
 
         <input type="submit" value="Add to Queue">
     </form>
+    <div id="video-queue" class="video-container"></div>
+
+    <script src="index.js"></script>
 </body>
 </html>

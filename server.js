@@ -1,21 +1,26 @@
 const VideoQueue = require('./queue');
 const {logIntoAcc, postVideo} = require('./instagram');
-require("dotenv").config();
+const {addHtml} = require('./utils');
 const express = require('express');
 const multer = require('multer');
-const { IgApiClient } = require('instagram-private-api');
 const fs = require('fs');
+const path = require('path');
 
+require("dotenv").config();
 const app = express();
 const upload = multer({dest: "uploads/"});
-app.use(express.static('public'));
+app.use(express.static(path.join(__dirname, 'public')));
 const videoQueue = new VideoQueue();
 
-app.post("/add_to_queue", upload.fields([{name: "video"}, {name:"cover"}]), async (req, res) => {
-    try{
-        const username = process.env.IG_USERNAME;
-        const password = process.env.IG_PASSWORD;
+let htmlContent = '';
 
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
+// Handle form submission to add video to queue
+app.post('/add_to_queue', upload.fields([{ name: 'video' }, { name: 'cover' }]), async (req, res) => {
+    try {
         const videoPath = req.files.video[0].path;
         const coverPath = req.files.cover[0].path;
         const caption = req.body.caption;
@@ -24,26 +29,30 @@ app.post("/add_to_queue", upload.fields([{name: "video"}, {name:"cover"}]), asyn
             videoPath: videoPath,
             coverPath: coverPath,
             caption: caption
-        }
+        };
 
-        addtoQueue(videoDetails);
-
-        res.send(`Video, ${videoPath} recevied and processed by server!`);
+        addToQueue(videoDetails);
+        res.send("Video added to queue.");
     } catch (error) {
         console.error(error);
         res.status(500).send("An error occurred while uploading the video");
     }
-
 });
 
-async function addtoQueue(videoDetails){
-    videoQueue.enqueue(videoDetails);
-    console.log("Video added to the queue!");
-    console.log("queue:" + videoQueue.peek().caption); // quick test
-}
+// Serve the current queue HTML
+app.get('/get-queue-html', (req, res) => {
+    res.send(htmlContent);
+});
 
+// Function to add video to queue and update HTML content
+function addToQueue(videoDetails) {
+    videoQueue.enqueue(videoDetails);
+    htmlContent += addHtml(videoDetails);
+    console.log("Video added to the queue!");
+    console.log("Queue:" + videoQueue.peek().caption); // quick test
+}
 
 const PORT = process.env.PORT || 5500;
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
-})
+});
